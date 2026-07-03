@@ -1,6 +1,7 @@
 # Model 1: TF-IDF features + Logistic Regression
 import os
 import json
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -45,6 +46,10 @@ def main():
           f"(95% CI {metrics['accuracy_ci'][0]:.3f}-{metrics['accuracy_ci'][1]:.3f})")
     print(f"Macro-F1: {metrics['macro_f1']:.3f} "
           f"(95% CI {metrics['macro_f1_ci'][0]:.3f}-{metrics['macro_f1_ci'][1]:.3f})")
+
+    # save predictions for the comparison script (confusion matrix, etc.)
+    pd.DataFrame({"true": y_test, "pred": y_pred}).to_csv(
+        f"{RESULTS_DIR}/baseline_preds.csv", index=False)
 
     metrics["model"] = "tfidf_logreg"
     with open(f"{RESULTS_DIR}/baseline.json", "w") as f:

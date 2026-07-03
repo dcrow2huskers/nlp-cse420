@@ -108,6 +108,11 @@ def main():
     print(f"Macro-F1: {metrics['macro_f1']:.3f} "
           f"(95% CI {metrics['macro_f1_ci'][0]:.3f}-{metrics['macro_f1_ci'][1]:.3f})")
 
+    # save predictions for the comparison script (confusion matrix, etc.)
+    import pandas as pd
+    pd.DataFrame({"true": y_test, "pred": y_pred}).to_csv(
+        f"{RESULTS_DIR}/transformer_preds.csv", index=False)
+
     metrics["model"] = "distilbert"
     with open(f"{RESULTS_DIR}/transformer.json", "w") as f:
         json.dump(metrics, f, indent=2)
