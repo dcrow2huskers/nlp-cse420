@@ -1,0 +1,513 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  conference,
+  letterpaper]{IEEEtran}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{hyperref}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\author{}
+\date{}
+\begin{document}
+
+
+\title{Sentiment Classification on GoEmotions: A Comparative Study of Text Classification Methods}
+\author{
+  \IEEEauthorblockN{Anuruddha Ekanayake}
+  \IEEEauthorblockA{\textit{School of Computing} \\
+    \textit{University of Nebraska-Lincoln}\\
+    Lincoln, USA \\
+    aekanayake2@nebraska.edu}
+  \and
+  \IEEEauthorblockN{Arian Alai}
+  \IEEEauthorblockA{\textit{Institute of Agriculture and Natural Resources} \\
+    \textit{University of Nebraska-Lincoln}\\
+    Lincoln, USA \\
+    aalai4@nebraska.edu}
+  \and
+  \IEEEauthorblockN{Daniel Crow}
+  \IEEEauthorblockA{\textit{School of Computing} \\
+    \textit{University of Nebraska-Lincoln}\\
+    Lincoln, USA \\
+    dcrow2@nebraska.edu}
+}
+\maketitle
+
+\begin{abstract}
+In progress...
+\end{abstract}
+
+\section{Introduction}\label{introduction}
+
+Emotion and sentiment analysis of natural language text is a fundamental
+task in Natural Language Processing (NLP) with applications in customer
+service, social media analysis, and public opinion monitoring. The
+advent of modern social media platforms has led to a massive influx of
+informal text, which is often characterized by noisy writing, slang, and
+complex emotional expressions. Standard sentiment analysis (classifying
+text into positive, negative, or neutral) is often insufficient for
+capturing the rich emotional cues present in these comments.
+
+The GoEmotions dataset {[}@demszky-etal-2020-goemotions{]} is a large,
+human-annotated corpus of 58k Reddit comments labeled with 28
+fine-grained emotion categories. In this project, we address a
+simplified variant of the task: 4-way single-label sentiment
+classification. We filter the comments to keep only those with exactly
+one emotion label, and map that label to one of four sentiment classes:
+\emph{positive}, \emph{negative}, \emph{neutral}, or \emph{ambiguous}.
+
+To solve this problem, we implement and compare two different modeling
+approaches: 1. A baseline model consisting of a TF-IDF vectorizer (using
+word and character n-grams) combined with a Logistic Regression
+classifier. 2. A deep learning approach using a pre-trained DistilBERT
+transformer fine-tuned on the training data.
+
+We evaluate both models on the test split, report their classification
+accuracy and macro-F1 scores along with 95\% bootstrap confidence
+intervals, and analyze their per-class performance to justify the
+selection of the best-performing model.
+
+\section{Problem Description}\label{problem-description}
+
+The sentiment classification task is framed as a supervised single-label
+classification problem.
+
+\textbf{Inputs:} The input is a raw text string \(x \in \mathcal{X}\),
+representing a single Reddit comment. The text is preprocessed by
+collapsing whitespace, removing newlines, and striping leading/trailing
+whitespace.
+
+\textbf{Outputs:} The output is a categorical label
+\(y \in \mathcal{Y}\), where:
+\[\mathcal{Y} = \{\text{negative}, \text{neutral}, \text{positive}, \text{ambiguous}\}\]
+
+\subsubsection{Sentiment Mapping}\label{sentiment-mapping}
+
+We map the original 28 GoEmotions categories to our target categories as
+follows:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Positive:} admiration, amusement, approval, caring, desire,
+  excitement, gratitude, joy, love, optimism, pride, relief.
+\item
+  \textbf{Negative:} anger, annoyance, disappointment, disapproval,
+  disgust, embarrassment, fear, grief, nervousness, remorse, sadness.
+\item
+  \textbf{Ambiguous:} confusion, curiosity, realization, surprise.
+\item
+  \textbf{Neutral:} neutral.
+\end{itemize}
+
+To handle multi-label comments, we restrict the dataset to comments that
+have exactly one active emotion label. The preprocessed splits contain
+the following class counts: * \textbf{Train Set:} 36,308 samples (12,920
+positive, 12,823 neutral, 7,012 negative, 3,553 ambiguous). *
+\textbf{Validation Set:} 4,548 samples. * \textbf{Test Set:} 4,590
+samples (1,606 neutral, 1,603 positive, 932 negative, 449 ambiguous).
+
+\section{Models Used}\label{models-used}
+
+We utilize two models representing different levels of model complexity
+and linguistic representations.
+
+\subsubsection{Model 1: TF-IDF + Logistic Regression
+(Baseline)}\label{model-1-tf-idf-logistic-regression-baseline}
+
+Our baseline model utilizes a standard bag-of-words approach: 1.
+\textbf{Feature Extraction:} A \texttt{TfidfVectorizer} computes tf-idf
+features using word and character n-grams in the range \((1, 2)\). We
+restrict the vocabulary to the top 50,000 features, apply sublinear
+term-frequency scaling (\(\text{tf} \leftarrow 1 + \log(\text{tf})\)),
+and filter out features appearing in only one document. 2.
+\textbf{Classification:} A \texttt{LogisticRegression} classifier is
+trained on the TF-IDF representations. To handle class imbalance, we use
+balanced class weights, which scales the loss inversely proportional to
+class frequencies. The inverse regularization parameter is set to
+\(C = 1.0\), and the model is trained using the L-BFGS solver.
+
+\subsubsection{Model 2: Fine-Tuned DistilBERT
+(Transformer)}\label{model-2-fine-tuned-distilbert-transformer}
+
+DistilBERT {[}@sanh2019distilbert{]} is a distilled, light version of
+the Bidirectional Encoder Representations from Transformers (BERT)
+model. It uses 40\% fewer parameters (66 million compared to BERT's 110
+million) and is 60\% faster, while retaining 97\% of BERT's language
+understanding capabilities. 1. \textbf{Tokenization:} Text is tokenized
+using the WordPiece tokenizer with a maximum sequence length of 64
+tokens. 2. \textbf{Architecture:} A classification head (a linear layer
+mapping the 768-dimensional CLS token representation to the 4 classes)
+is added on top of the pre-trained DistilBERT layers. 3.
+\textbf{Fine-Tuning:} We fine-tune the model for 2 epochs using the
+AdamW optimizer with a learning rate of \(2 \times 10^{-5}\) and batch
+size of 16 on the full training dataset of 36,308 examples.
+
+\section{Performance Comparison}\label{performance-comparison}
+
+We evaluate both models on the test set of 4,590 samples. To measure
+statistical significance, we estimate the 95\% confidence intervals (CI)
+for both accuracy and macro-F1 using bootstrapping with \(N = 1,000\)
+resamples.
+
+\subsubsection{Overall Performance}\label{overall-performance}
+
+Table 1 summarizes the overall performance of the two models on the test
+set.
+
+\begin{table}[h]
+\centering
+\caption{Overall test performance of the classification models.}
+\begin{tabular}{l p{3.5cm} p{3.5cm}}
+\toprule
+Model & Accuracy (95\% CI) & Macro-F1 (95\% CI) \\
+\midrule
+\textbf{TF-IDF + Logistic Regression} & 0.636 [0.622, 0.650] & 0.601 [0.585, 0.616] \\
+\textbf{Fine-Tuned DistilBERT} & \textbf{0.715} [0.703, 0.728] & \textbf{0.684} [0.669, 0.699] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Per-Class F1 Analysis}\label{per-class-f1-analysis}
+
+Table 2 breaks down the performance by sentiment class using the
+F1-score indicator.
+
+\begin{table}[h]
+\centering
+\caption{Per-class F1-scores on the test set.}
+\begin{tabular}{lccc}
+\toprule
+Class & TF-IDF + LogReg & Fine-Tuned DistilBERT & Improvement \\
+\midrule
+\textbf{negative} & 0.576 & \textbf{0.674} & +0.098 \\
+\textbf{neutral} & 0.629 & \textbf{0.679} & +0.050 \\
+\textbf{positive} & 0.747 & \textbf{0.818} & +0.071 \\
+\textbf{ambiguous} & 0.452 & \textbf{0.566} & +0.114 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Visualizations}\label{visualizations}
+
+The performance comparisons are illustrated in the figures below.
+Figure~\ref{fig-accuracy} shows the test accuracy along with the 95\%
+confidence intervals. Figure~\ref{fig-f1-plot} shows the per-class
+F1-scores, illustrating that DistilBERT consistently outperforms the
+baseline across all classes.
+
+\begin{figure*}
+
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{results/accuracy_ci.png}}
+
+}
+
+\subcaption{\label{fig-accuracy}Test Accuracy}
+
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{results/per_class_f1.png}}
+
+}
+
+\subcaption{\label{fig-f1-plot}Per-Class F1 Score}
+
+\end{minipage}%
+\newline
+\begin{minipage}{0.50\linewidth}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{results/confusion_matrices.png}
+
+}
+
+\subcaption{\label{fig-confusion-matrices}Normalized Confusion Matrices}
+
+\end{minipage}%
+
+\caption{\label{fig-results}Overall evaluation results, including
+metrics confidence bounds and error distributions.}
+
+\end{figure*}%
+
+\subsubsection{Justification of the Best
+Model}\label{justification-of-the-best-model}
+
+Based on the empirical results, the \textbf{Fine-Tuned DistilBERT} model
+is the superior model: 1. \textbf{Statistical Significance:} The 95\%
+confidence interval for DistilBERT's accuracy (\([0.703, 0.728]\)) does
+not overlap with the baseline's accuracy confidence interval
+(\([0.622, 0.650]\)). The lower bound of DistilBERT is strictly greater
+than the upper bound of the baseline, which proves that the performance
+improvement is statistically significant. 2. \textbf{Consistent Class
+Improvements:} DistilBERT outperforms the baseline on all classes. The
+most significant improvement occurs in the minority ``ambiguous'' class,
+where the F1-score increases from 0.452 to 0.566 (+0.114 improvement),
+and the ``negative'' class, where the F1-score increases from 0.576 to
+0.674 (+0.098 improvement), demonstrating that the contextual
+transformer is better equipped to handle subtle, complex, and negative
+emotional expressions.
+
+\section{Pros and Cons of the
+Approach}\label{pros-and-cons-of-the-approach}
+
+\subsubsection{TF-IDF + Logistic
+Regression}\label{tf-idf-logistic-regression}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pros:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Efficiency:} Training takes less than 30 seconds and
+    requires minimal memory and CPU resources.
+  \item
+    \textbf{Interpretability:} The linear model weights are directly
+    inspectable, allowing us to find the most indicative n-grams for
+    each sentiment.
+  \item
+    \textbf{Simplicity:} No hyperparameter tuning or deep learning
+    infrastructure is required.
+  \end{itemize}
+\item
+  \textbf{Cons:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Lack of Context:} By relying on bag-of-words, the model
+    ignores word order, meaning sentences like ``not positive'' and
+    ``positive, not'' have identical feature representations.
+  \item
+    \textbf{Out-of-Vocabulary (OOV):} The model cannot handle words
+    unseen during training.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{Fine-Tuned DistilBERT}\label{fine-tuned-distilbert}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pros:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Contextual Representation:} Captures complex syntactic
+    patterns, semantic dependencies, and word order.
+  \item
+    \textbf{Transfer Learning:} Leverages massive pre-training on
+    general English corpora, allowing it to adapt to social media text
+    with very few training epochs (e.g., fine-tuned on the full 36k
+    examples for only 2 epochs).
+  \item
+    \textbf{Robustness:} Handles spelling mistakes, subwords, and
+    abbreviations via WordPiece tokenization.
+  \end{itemize}
+\item
+  \textbf{Cons:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Resource Intensive:} Requires significant compute time (took
+    \textasciitilde10 minutes on CPU for a single epoch) and memory.
+  \item
+    \textbf{Black Box:} High-dimensional attention maps and weights make
+    model predictions hard to interpret.
+  \end{itemize}
+\end{itemize}
+
+\section{Conclusion}\label{conclusion}
+
+We compared a traditional linear baseline with a transformer model on a
+4-way sentiment classification task using the GoEmotions dataset. Our
+evaluation demonstrates that a fine-tuned DistilBERT transformer
+significantly outperforms a TF-IDF + Logistic Regression baseline
+trained on the same data. The accuracy improvement (0.715 vs.~0.636) is
+statistically significant as verified by non-overlapping bootstrap
+confidence intervals. The transformer's ability to represent word order
+and contextual nuances is especially beneficial for noisy social media
+comments, justifying the additional computational cost.
+
+
+
+
+\end{document}
