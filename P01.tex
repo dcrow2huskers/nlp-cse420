@@ -203,14 +203,16 @@ In progress...
 
 \section{Introduction}\label{introduction}
 
-Emotion and sentiment analysis of natural language text is a fundamental
-task in Natural Language Processing (NLP) with applications in customer
+Emotion and sentiment analysis are fundamental tasks in Natural Language
+Processing (NLP). These tasks allow for the conversion of raw, human
+language into structured data denoting emotional intent, making them
+useful tools for a wide range of applications, including customer
 service, social media analysis, and public opinion monitoring. The
-advent of modern social media platforms has led to a massive influx of
-informal text, which is often characterized by noisy writing, slang, and
-complex emotional expressions. Standard sentiment analysis (classifying
-text into positive, negative, or neutral) is often insufficient for
-capturing the rich emotional cues present in these comments.
+widespread adoption of social media has especially led to a massive
+influx of informal text, which is often characterized by noisy writing,
+slang, and complex emotional expressions. Standard sentiment analysis
+(classifying text into positive, negative, or neutral) is often
+insufficient for capturing the nuances of these diverse expressions.
 
 The GoEmotions dataset {[}@demszky-etal-2020-goemotions{]} is a large,
 human-annotated corpus of 58k Reddit comments labeled with 28
@@ -220,29 +222,27 @@ classification. We filter the comments to keep only those with exactly
 one emotion label, and map that label to one of four sentiment classes:
 \emph{positive}, \emph{negative}, \emph{neutral}, or \emph{ambiguous}.
 
-To solve this problem, we implement and compare two different modeling
-approaches: 1. A baseline model consisting of a TF-IDF vectorizer (using
-word and character n-grams) combined with a Logistic Regression
-classifier. 2. A deep learning approach using a pre-trained DistilBERT
-transformer fine-tuned on the training data.
+To address this task, we compare two modeling approaches. The first is a
+baseline model that combines TF-IDF features derived from word- and
+character-level n-grams with a Logistic Regression classifier. The
+second is a transformer-based approach that fine-tunes a pre-trained
+DistilBERT model on the training data.
 
 We evaluate both models on the test split, report their classification
 accuracy and macro-F1 scores along with 95\% bootstrap confidence
-intervals, and analyze their per-class performance to justify the
-selection of the best-performing model.
+intervals. We also analyze their per-class performance to determine the
+best-performing model for the task.
 
 \section{Problem Description}\label{problem-description}
 
 The sentiment classification task is framed as a supervised single-label
-classification problem.
+classification problem. Given an input text string \(x \in \mathcal{X}\)
+representing a single Reddit comment, the objective is to predict a
+label \(y \in \mathcal{Y}\). Prior to feature extraction, the text is
+preprocessed by collapsing consecutive whitespace, removing newline
+characters, and stripping leading and trailing whitespace. The label
+space is defined as
 
-\textbf{Inputs:} The input is a raw text string \(x \in \mathcal{X}\),
-representing a single Reddit comment. The text is preprocessed by
-collapsing whitespace, removing newlines, and striping leading/trailing
-whitespace.
-
-\textbf{Outputs:} The output is a categorical label
-\(y \in \mathcal{Y}\), where:
 \[\mathcal{Y} = \{\text{negative}, \text{neutral}, \text{positive}, \text{ambiguous}\}\]
 
 \subsubsection{Sentiment Mapping}\label{sentiment-mapping}
