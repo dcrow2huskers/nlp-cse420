@@ -253,7 +253,7 @@ fine-grained emotion categories. In this project, we address a
 simplified formulation of the task: 4-way single-label sentiment
 classification. We filter the comments to keep only those with exactly
 one emotion label, and map that label to one of four sentiment classes:
-\emph{positive}, \emph{negative}, \emph{neutral}, or \emph{ambiguous}.
+positive, negative, neutral, or ambiguous.
 
 To address this task, we compare two modeling approaches. The first is a
 baseline model that combines TF-IDF features derived from word-level
@@ -375,23 +375,23 @@ Settings}\label{hyperparameters-training-settings}
 To ensure reproducibility, all dataset shuffling, model initializations,
 and evaluations are fixed with a random seed of 42.
 
-For the \textbf{TF-IDF + Logistic Regression} baseline, features are
-computed using word-level n-grams with \(n \in \{1,2\}\) (Pedregosa et
-al. 2011). We restrict the vocabulary to the top 50,000 features, filter
-out features appearing in only one document (\(\text{min\_df} = 2\)),
-and apply sublinear term-frequency scaling
+For the TF-IDF + Logistic Regression baseline, features are computed
+using word-level n-grams with \(n \in \{1,2\}\) (Pedregosa et al. 2011).
+We restrict the vocabulary to the top 50,000 features, filter out
+features appearing in only one document (\(\text{min\_df} = 2\)), and
+apply sublinear term-frequency scaling
 (\(\text{tf} \leftarrow 1 + \log(\text{tf})\)). The Logistic Regression
 classifier is regularized with an inverse strength parameter of
 \(C = 1.0\) and optimized using the L-BFGS solver with a maximum of
 1,000 iterations. The model uses balanced class weights to compensate
 for class imbalance.
 
-For \textbf{DistilBERT}, input texts are padded or truncated to a
-maximum sequence length of 64 tokens. The model is fine-tuned for two
-epochs using the AdamW optimizer with a learning rate of
-\(2 \times 10^{-5}\) and a batch size of 16. Training was conducted
-using GPU acceleration. Unlike the baseline, DistilBERT is trained using
-standard cross-entropy loss without class weight adjustment.
+For DistilBERT, input texts are padded or truncated to a maximum
+sequence length of 64 tokens. The model is fine-tuned for two epochs
+using the AdamW optimizer with a learning rate of \(2 \times 10^{-5}\)
+and a batch size of 16. Training was conducted using GPU acceleration.
+Unlike the baseline, DistilBERT is trained using standard cross-entropy
+loss without class weight adjustment.
 
 \subsection{Evaluation Metrics}\label{evaluation-metrics}
 
@@ -474,13 +474,12 @@ ambiguous & 0.452 & \textbf{0.566} & +0.114 \\
 \end{table}
 
 DistilBERT achieves higher F1-scores for every sentiment class. The
-largest improvements occur for the \textbf{ambiguous} (+0.114) and
-\textbf{negative} (+0.098) classes, suggesting that contextual
-transformer representations are particularly effective for capturing
-indirect, nuanced, and context-dependent emotional expressions. More
-modest gains are observed for the \textbf{positive} (+0.071) and
-\textbf{neutral} (+0.050) classes, indicating that these categories are
-comparatively easier for both models to identify.
+largest improvements occur for the ambiguous (+0.114) and negative
+(+0.098) classes, suggesting that contextual transformer representations
+are particularly effective for capturing indirect, nuanced, and
+context-dependent emotional expressions. More modest gains are observed
+for the positive (+0.071) and neutral (+0.050) classes, indicating that
+these categories are comparatively easier for both models to identify.
 
 \subsection{Visualizations}\label{visualizations}
 
@@ -533,16 +532,15 @@ Total & 36.4\% & 100.0\% & 28.5\% & 100.0\% \\
 \end{table*}
 
 The quantitative breakdown in Table \ref{tab:error_stats} reveals that
-both models exhibit the highest error rates on the \textbf{ambiguous}
-class (47.7\% for the baseline and 44.3\% for DistilBERT), indicating
-that non-polar or curiosity-driven sentiments remain challenging.
-DistilBERT achieves substantial error reductions on the polar classes:
-it reduces the error rate on \textbf{positive} comments by 12.2
-percentage points and on \textbf{negative} comments by 12.6 percentage
-points. However, the error rate reduction on the \textbf{neutral} class
-is minimal (reducing by only 2.1 percentage points). Consequently,
-neutral comments constitute the largest share of DistilBERT's errors
-(40.9\%).
+both models exhibit the highest error rates on the ambiguous class
+(47.7\% for the baseline and 44.3\% for DistilBERT), indicating that
+non-polar or curiosity-driven sentiments remain challenging. DistilBERT
+achieves substantial error reductions on the polar classes: it reduces
+the error rate on positive comments by 12.2 percentage points and on
+negative comments by 12.6 percentage points. However, the error rate
+reduction on the neutral class is minimal (reducing by only 2.1
+percentage points). Consequently, neutral comments constitute the
+largest share of DistilBERT's errors (40.9\%).
 
 \subsubsection{TF-IDF + Logistic Regression
 Errors}\label{tf-idf-logistic-regression-errors}

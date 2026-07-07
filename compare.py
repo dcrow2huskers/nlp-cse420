@@ -106,6 +106,23 @@ def significance(data):
         print("The 95% confidence intervals overlap; the difference is not clearly significant.")
 
 
+def print_error_analysis(data):
+    print("\n=== Error Breakdown by Class ===")
+    for label, _, preds in data:
+        y_true = preds["true"].values
+        y_pred = preds["pred"].values
+        err_mask = y_true != y_pred
+        total_errors = np.sum(err_mask)
+        
+        print(f"\n{label} Error distribution by true class:")
+        for cls in LABELS:
+            cls_errs = np.sum(err_mask & (y_true == cls))
+            cls_total = np.sum(y_true == cls)
+            err_rate = cls_errs / cls_total if cls_total > 0 else 0
+            err_share = cls_errs / total_errors if total_errors > 0 else 0
+            print(f"  {cls:<10}: {cls_errs} errors out of {cls_total} samples ({err_rate:.1%}) -- represents {err_share:.1%} of total errors")
+
+
 def main():
     data = [(lbl, *load(name)) for lbl, name in MODELS]
     print_table(data)
@@ -114,6 +131,7 @@ def main():
     plot_per_class_f1(rows)
     plot_confusion(data)
     significance(data)
+    print_error_analysis(data)
 
 
 if __name__ == "__main__":
