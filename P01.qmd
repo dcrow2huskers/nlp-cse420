@@ -23,6 +23,7 @@ header-includes:
   - \usepackage{setspace}
   - \usepackage{caption}
   - \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+  - \renewcommand\IEEEkeywordsname{Keywords}
 ---
 
 ```{=latex}
@@ -51,6 +52,10 @@ header-includes:
 \begin{abstract}
 In this work, we study sentiment classification on the GoEmotions dataset by mapping fine-grained emotions to four coarse sentiment categories: positive, negative, neutral, and ambiguous. To formulate the problem as a single-label classification task, we retain only samples with exactly one emotion label. We train and compare two classification models: a Term Frequency-Inverse Document Frequency (TF-IDF) feature pipeline with a Logistic Regression classifier, and a fine-tuned DistilBERT transformer. Our experimental results show that the TF-IDF + Logistic Regression baseline achieves a classification accuracy of 0.636 (95\% Confidence Interval (CI) [0.622, 0.650]) and macro-F1 of 0.601 (95\% CI [0.585, 0.616]). Fine-tuning DistilBERT on the full training dataset yields a test accuracy of 0.715 (95\% CI [0.703, 0.728]) and macro-F1 of 0.684 (95\% CI [0.669, 0.699]). We report 95\% bootstrap confidence intervals for both models, demonstrating the range of performance variability on the test set.
 \end{abstract}
+
+\begin{IEEEkeywords}
+sentiment analysis, emotion classification, GoEmotions, DistilBERT, logistic regression, bootstrapping
+\end{IEEEkeywords}
 ```
 
 # Introduction
@@ -61,7 +66,7 @@ The GoEmotions dataset [@demszky-etal-2020-goemotions] is a large, human-annotat
 
 To address this task, we compare two modeling approaches. The first is a baseline model that combines TF-IDF features derived from word-level $n$-grams with a Logistic Regression classifier. The second is a transformer-based approach that fine-tunes a pre-trained DistilBERT model on the training data.
 
-We evaluate both models on the test split, report their classification accuracy and macro-F1 scores along with 95% bootstrap confidence intervals. We also analyze their per-class performance to determine the best-performing model for the task.
+Our evaluation on the test split shows that the baseline TF-IDF + Logistic Regression model achieves a classification accuracy of 0.636 and macro-F1 of 0.601. The fine-tuned DistilBERT transformer outperforms this baseline, achieving an accuracy of 0.715 and macro-F1 of 0.684, with nonoverlapping 95% bootstrap confidence intervals. We conclude that while the TF-IDF pipeline remains valuable for its computational efficiency and interpretability, the deep contextual representations captured by DistilBERT are critical for modeling the nuanced and complex emotional expressions characteristic of social media communication.
 
 # Problem Description
 
@@ -105,7 +110,7 @@ After filtering multi-label comments and mapping the original 28 emotions into f
 \centering
 \caption{Dataset splits and class counts after single-label filtering.}
 \label{tab:dataset_splits}
-\small
+\footnotesize
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 Sentiment Class & Train & Val & Test & Total \\
@@ -159,7 +164,7 @@ Table \ref{tab:overall_perf} summarizes the overall performance of the two model
 \centering
 \caption{Overall test performance of the classification models.}
 \label{tab:overall_perf}
-\small
+\footnotesize
 \begin{tabular}{@{}lcc@{}}
 \toprule
 Model & Accuracy (95\% CI) & Macro-F1 (95\% CI) \\
@@ -182,7 +187,7 @@ Table \ref{tab:per_class_f1} reports the F1-score for each sentiment class.
 \centering
 \caption{Per-class F1-scores on the test set.}
 \label{tab:per_class_f1}
-\small
+\footnotesize
 \begin{tabular}{@{}lccc@{}}
 \toprule
 Class & TF-IDF + LogReg & DistilBERT & Diff \\
@@ -230,7 +235,7 @@ To understand the limitations of both modeling approaches, we conduct an error a
 \begin{table*}[t]
 \centering
 \caption{Error rates and error distributions by true class on the test set.}
-\small
+\footnotesize
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 & \multicolumn{2}{c}{TF-IDF + Logistic Regression} & \multicolumn{2}{c}{DistilBERT} \\
@@ -249,7 +254,7 @@ Total & 36.4\% & 100.0\% & 28.5\% & 100.0\% \\
 \end{table*}
 ```
 
-The quantitative breakdown in Table \ref{tab:error_stats} reveals that both models exhibit the highest error rates on the ambiguous class (47.7\% for the baseline and 44.3\% for DistilBERT), indicating that non-polar or curiosity-driven sentiments remain challenging. DistilBERT achieves substantial error reductions on the polar classes: it reduces the error rate on positive comments by 12.2 percentage points and on negative comments by 12.6 percentage points. However, the error rate reduction on the neutral class is minimal (reducing by only 2.1 percentage points). Consequently, neutral comments constitute the largest share of DistilBERT's errors (40.9\%).
+The quantitative breakdown in Table \ref{tab:error_stats} reveals that both models exhibit the highest error rates on the ambiguous class (47.7\% for the baseline and 44.3\% for DistilBERT), indicating that nonpolar or curiosity-driven sentiments remain challenging. DistilBERT achieves substantial error reductions on the polar classes: it reduces the error rate on positive comments by 12.2 percentage points and on negative comments by 12.6 percentage points. However, the error rate reduction on the neutral class is minimal (reducing by only 2.1 percentage points). Consequently, neutral comments constitute the largest share of DistilBERT's errors (40.9\%).
 
 ### TF-IDF + Logistic Regression Errors
 
