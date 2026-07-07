@@ -92,6 +92,39 @@
 \makeatother
 
 
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 
 
@@ -198,15 +231,15 @@
 \maketitle
 
 \begin{abstract}
-In progress...
+In this work, we study sentiment classification on the GoEmotions dataset by mapping fine-grained emotions to four coarse sentiment categories: positive, negative, neutral and ambiguous. To simplify the task in a single-label setting, only samples with exactly one emotion label are retained. We train and compare two classification models: a Term Frequency-Inverse Document Frequency (TF-IDF) feature pipeline with a Logistic Regression classifier, and a fine-tuned DistilBERT transformer. Our experimental results show that the TF-IDF + Logistic Regression baseline achieves a classification accuracy of 0.636 (95\% Confidence Interval (CI) [0.622, 0.650]) and macro-F1 of 0.601 (95\% CI [0.585, 0.616]). Fine-tuning DistilBERT on the full training dataset yields a test accuracy of 0.715 (95\% CI [0.703, 0.728]) and macro-F1 of 0.684 (95\% CI [0.669, 0.699]). Since the 95\% confidence intervals for accuracy do not overlap, we conclude that the transformer-based model provides a statistically significant improvement over the linear baseline.
 \end{abstract}
 
 \section{Introduction}\label{introduction}
 
 Emotion and sentiment analysis are fundamental tasks in Natural Language
-Processing (NLP). These tasks allow for the conversion of raw, human
+Processing (NLP). These tasks enable the conversion of raw, human
 language into structured data denoting emotional intent, making them
-useful tools for a wide range of applications, including customer
+useful techniques for a wide range of applications, including customer
 service, social media analysis, and public opinion monitoring. The
 widespread adoption of social media has especially led to a massive
 influx of informal text, which is often characterized by noisy writing,
@@ -214,10 +247,10 @@ slang, and complex emotional expressions. Standard sentiment analysis
 (classifying text into positive, negative, or neutral) is often
 insufficient for capturing the nuances of these diverse expressions.
 
-The GoEmotions dataset {[}@demszky-etal-2020-goemotions{]} is a large,
-human-annotated corpus of 58k Reddit comments labeled with 28
+The GoEmotions dataset (Demszky et al. 2020) is a large, human-annotated
+corpus with approximately 58,000 Reddit comments labeled with 28
 fine-grained emotion categories. In this project, we address a
-simplified variant of the task: 4-way single-label sentiment
+simplified formulation of the task: 4-way single-label sentiment
 classification. We filter the comments to keep only those with exactly
 one emotion label, and map that label to one of four sentiment classes:
 \emph{positive}, \emph{negative}, \emph{neutral}, or \emph{ambiguous}.
@@ -245,10 +278,10 @@ space is defined as
 
 \[\mathcal{Y} = \{\text{negative}, \text{neutral}, \text{positive}, \text{ambiguous}\}\]
 
-\subsubsection{Sentiment Mapping}\label{sentiment-mapping}
+\subsection{Sentiment Mapping}\label{sentiment-mapping}
 
-We map the original 28 GoEmotions categories to our target categories as
-follows:
+We map the original 28 GoEmotions categories to our target sentiment
+classes as follows:
 
 \begin{itemize}
 \tightlist
@@ -264,57 +297,117 @@ follows:
   \textbf{Neutral:} neutral.
 \end{itemize}
 
-To handle multi-label comments, we restrict the dataset to comments that
-have exactly one active emotion label. The preprocessed splits contain
-the following class counts: * \textbf{Train Set:} 36,308 samples (12,920
-positive, 12,823 neutral, 7,012 negative, 3,553 ambiguous). *
-\textbf{Validation Set:} 4,548 samples. * \textbf{Test Set:} 4,590
-samples (1,606 neutral, 1,603 positive, 932 negative, 449 ambiguous).
+To formulate the problem as a single-label classification task, we
+retain only comments with exactly one emotion label.
 
-\section{Models Used}\label{models-used}
+\section{Methodology}\label{methodology}
 
-We utilize two models representing different levels of model complexity
-and linguistic representations.
+We compare a linear baseline with a transformer-based model for
+sentiment classification.
 
-\subsubsection{Model 1: TF-IDF + Logistic Regression
-(Baseline)}\label{model-1-tf-idf-logistic-regression-baseline}
+\subsection{TF-IDF + Logistic Regression
+(Baseline)}\label{tf-idf-logistic-regression-baseline}
 
-Our baseline model utilizes a standard bag-of-words approach: 1.
-\textbf{Feature Extraction:} A \texttt{TfidfVectorizer} computes tf-idf
-features using word and character n-grams in the range \((1, 2)\). We
-restrict the vocabulary to the top 50,000 features, apply sublinear
-term-frequency scaling (\(\text{tf} \leftarrow 1 + \log(\text{tf})\)),
-and filter out features appearing in only one document. 2.
-\textbf{Classification:} A \texttt{LogisticRegression} classifier is
-trained on the TF-IDF representations. To handle class imbalance, we use
-balanced class weights, which scales the loss inversely proportional to
-class frequencies. The inverse regularization parameter is set to
-\(C = 1.0\), and the model is trained using the L-BFGS solver.
+The baseline model maps raw comments into a sparse vector space using
+term frequency-inverse document frequency (TF-IDF) feature weighting.
+Character-level n-grams are extracted to capture subword details (such
+as punctuation patterns and word endings), while word-level n-grams
+capture explicit emotional descriptors. By considering both unigrams and
+bigrams, the vectorizer captures local lexical patterns, including
+frequently occurring phrases such as short negation expressions. The
+resulting vectors are passed to a multi-class Logistic Regression
+classifier, which models the probability of each sentiment class as a
+linear combination of the lexical features. To prevent overfitting to
+the large feature space, the model is trained with L2 regularization,
+and class weights are adjusted to compensate for training set imbalance.
 
-\subsubsection{Model 2: Fine-Tuned DistilBERT
-(Transformer)}\label{model-2-fine-tuned-distilbert-transformer}
+\subsection{Fine-Tuned DistilBERT
+(Transformer)}\label{fine-tuned-distilbert-transformer}
 
-DistilBERT {[}@sanh2019distilbert{]} is a distilled, light version of
-the Bidirectional Encoder Representations from Transformers (BERT)
-model. It uses 40\% fewer parameters (66 million compared to BERT's 110
-million) and is 60\% faster, while retaining 97\% of BERT's language
-understanding capabilities. 1. \textbf{Tokenization:} Text is tokenized
-using the WordPiece tokenizer with a maximum sequence length of 64
-tokens. 2. \textbf{Architecture:} A classification head (a linear layer
-mapping the 768-dimensional CLS token representation to the 4 classes)
-is added on top of the pre-trained DistilBERT layers. 3.
-\textbf{Fine-Tuning:} We fine-tune the model for 2 epochs using the
-AdamW optimizer with a learning rate of \(2 \times 10^{-5}\) and batch
-size of 16 on the full training dataset of 36,308 examples.
+DistilBERT (Sanh et al. 2019) is a compact transformer model derived
+from BERT via knowledge distillation to learn deep contextualized text
+representations. Unlike TF-IDF, which treats words independently of
+their position, DistilBERT utilizes self-attention mechanisms to
+dynamically compute representations where a word's vector changes
+depending on its surrounding tokens. Input text is segmented using
+WordPiece subword tokenization to mitigate out-of-vocabulary terms. The
+token sequence is then processed through transformer layers to capture
+long-range semantic and syntactic dependencies. For classification, the
+final hidden state corresponding to the special \texttt{{[}CLS{]}} token
+is used as a sequence-level representation for classification. A linear
+classification layer maps this contextual vector to logits corresponding
+to the target sentiment classes. During training, the pre-trained
+encoder weights and the classification head are jointly fine-tuned on
+our target data.
 
-\section{Performance Comparison}\label{performance-comparison}
+\section{Experimental Setup}\label{experimental-setup}
 
-We evaluate both models on the test set of 4,590 samples. To measure
-statistical significance, we estimate the 95\% confidence intervals (CI)
-for both accuracy and macro-F1 using bootstrapping with \(N = 1,000\)
+This section details the dataset partitions, model hyperparameters, and
+metrics used in our evaluation.
+
+\subsection{Dataset Splits}\label{dataset-splits}
+
+After filtering multi-label comments and mapping the original 28
+emotions into four sentiment categories, the resulting dataset is split
+into training, validation, and test sets. The class counts for each
+split are:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Train Set:} 36,308 samples (12,920 positive, 12,823 neutral,
+  7,012 negative, 3,553 ambiguous).
+\item
+  \textbf{Validation Set:} 4,548 samples (1,668 positive, 1,592 neutral,
+  853 negative, 435 ambiguous).
+\item
+  \textbf{Test Set:} 4,590 samples (1,606 neutral, 1,603 positive, 932
+  negative, 449 ambiguous).
+\end{itemize}
+
+\subsection{Hyperparameters \& Training
+Settings}\label{hyperparameters-training-settings}
+
+For the \textbf{TF-IDF + Logistic Regression} baseline, features are
+computed using word and character n-grams with \(n \in \{1,2\}\). We
+restrict the vocabulary to the top 50,000 features, filter out features
+appearing in only one document (\(min\_df = 2\)), and apply sublinear
+term-frequency scaling (\(\text{tf} \leftarrow 1 + \log(\text{tf})\)).
+The Logistic Regression classifier is regularized with an inverse
+strength parameter of \(C = 1.0\) and optimized using the L-BFGS solver
+with a maximum of 1,000 iterations.
+
+For \textbf{DistilBERT}, input texts are padded or truncated to a
+maximum sequence length of 64 tokens. The model is fine-tuned for two
+epochs using the AdamW optimizer with a learning rate of
+\(2 \times 10^{-5}\) and a batch size of 16. Training was conducted
+using GPU acceleration.
+
+\subsection{Evaluation Metrics}\label{evaluation-metrics}
+
+We evaluate both models on the held-out test split using:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Classification Accuracy:} The percentage of comments predicted
+  correctly.
+\item
+  \textbf{Macro-F1 Score:} The unweighted average of F1-scores across
+  all sentiment classes, ensuring that minority classes (such as
+  ``ambiguous'') are weighted equally.
+\item
+  \textbf{Per-Class F1-Score:} To evaluate performance variations across
+  specific sentiments.
+\end{itemize}
+
+To quantify uncertainty, we estimate 95\% confidence intervals (CI) for
+both accuracy and macro-F1 using bootstrapping with \(N = 1,000\)
 resamples.
 
-\subsubsection{Overall Performance}\label{overall-performance}
+\section{Results and Discussion}\label{results-and-discussion}
+
+\subsection{Overall Performance}\label{overall-performance}
 
 Table 1 summarizes the overall performance of the two models on the test
 set.
@@ -322,190 +415,175 @@ set.
 \begin{table}[h]
 \centering
 \caption{Overall test performance of the classification models.}
-\begin{tabular}{l p{3.5cm} p{3.5cm}}
+\small
+\begin{tabular}{@{}lcc@{}}
 \toprule
 Model & Accuracy (95\% CI) & Macro-F1 (95\% CI) \\
 \midrule
-\textbf{TF-IDF + Logistic Regression} & 0.636 [0.622, 0.650] & 0.601 [0.585, 0.616] \\
-\textbf{Fine-Tuned DistilBERT} & \textbf{0.715} [0.703, 0.728] & \textbf{0.684} [0.669, 0.699] \\
+TF-IDF + LogReg & 0.636\,[0.622, 0.650] & 0.601\,[0.585, 0.616] \\
+DistilBERT & \textbf{0.715}\,[0.703, 0.728] & \textbf{0.684}\,[0.669, 0.699] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsubsection{Per-Class F1 Analysis}\label{per-class-f1-analysis}
+DistilBERT substantially outperformed the TF-IDF baseline, improving
+accuracy from 0.636 to 0.715 (+7.9 percentage points) and macro-F1 from
+0.601 to 0.684 (+8.3 percentage points). Furthermore, the bootstrap
+confidence intervals for accuracy show a clear separation between the
+two models, providing strong evidence that the observed improvement is
+unlikely to be due to sampling variability.
 
-Table 2 breaks down the performance by sentiment class using the
-F1-score indicator.
+\subsection{Per-Class F1 Analysis}\label{per-class-f1-analysis}
+
+Table 2 reports the F1-score for each sentiment class.
 
 \begin{table}[h]
 \centering
 \caption{Per-class F1-scores on the test set.}
-\begin{tabular}{lccc}
+\small
+\begin{tabular}{@{}lccc@{}}
 \toprule
-Class & TF-IDF + LogReg & Fine-Tuned DistilBERT & Improvement \\
+Class & TF-IDF + LogReg & DistilBERT & $\Delta$ \\
 \midrule
-\textbf{negative} & 0.576 & \textbf{0.674} & +0.098 \\
-\textbf{neutral} & 0.629 & \textbf{0.679} & +0.050 \\
-\textbf{positive} & 0.747 & \textbf{0.818} & +0.071 \\
-\textbf{ambiguous} & 0.452 & \textbf{0.566} & +0.114 \\
+negative & 0.576 & \textbf{0.674} & +0.098 \\
+neutral & 0.629 & \textbf{0.679} & +0.050 \\
+positive & 0.747 & \textbf{0.818} & +0.071 \\
+ambiguous & 0.452 & \textbf{0.566} & +0.114 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsubsection{Visualizations}\label{visualizations}
+DistilBERT achieved higher F1-scores for every sentiment class. The
+largest improvements occurred for the \textbf{ambiguous} (+0.114) and
+\textbf{negative} (+0.098) classes, suggesting that contextual
+transformer representations are particularly effective for recognizing
+indirect, nuanced, and context-dependent emotional expressions. More
+modest gains were observed for the \textbf{positive} (+0.071) and
+\textbf{neutral} (+0.050) classes, indicating that these categories are
+comparatively easier for both models to identify.
+
+\subsection{Visualizations}\label{visualizations}
 
 The performance comparisons are illustrated in the figures below.
-Figure~\ref{fig-accuracy} shows the test accuracy along with the 95\%
-confidence intervals. Figure~\ref{fig-f1-plot} shows the per-class
-F1-scores, illustrating that DistilBERT consistently outperforms the
-baseline across all classes.
+Fig.\ref{fig-accuracy} displays the overall test accuracy with 95\%
+bootstrap confidence intervals, Fig.\ref{fig-f1-plot} compares the
+per-class F1-scores, and
+Figs.\ref{fig-cm-baseline}--\ref{fig-cm-distilbert} present the
+normalized confusion matrices for both models.
 
-\begin{figure*}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results/accuracy_ci.png}
+\caption{Classification accuracy with 95\% bootstrap confidence intervals.}
+\label{fig-accuracy}
+\end{figure}
 
-\begin{minipage}{0.50\linewidth}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results/per_class_f1.png}
+\caption{Per-class F1-scores on the test set.}
+\label{fig-f1-plot}
+\end{figure}
 
-\centering{
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results/cm_baseline.png}
+\caption{Normalized confusion matrix for TF-IDF + Logistic Regression.}
+\label{fig-cm-baseline}
+\end{figure}
 
-\pandocbounded{\includegraphics[keepaspectratio]{results/accuracy_ci.png}}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results/cm_transformer.png}
+\caption{Normalized confusion matrix for fine-tuned DistilBERT.}
+\label{fig-cm-distilbert}
+\end{figure}
 
-}
+\subsection{Error Analysis}\label{error-analysis}
 
-\subcaption{\label{fig-accuracy}Test Accuracy}
+To understand the limitations of both modeling approaches, we conduct an
+error analysis on their classification failures on the test split.
 
-\end{minipage}%
-%
-\begin{minipage}{0.50\linewidth}
-
-\centering{
-
-\pandocbounded{\includegraphics[keepaspectratio]{results/per_class_f1.png}}
-
-}
-
-\subcaption{\label{fig-f1-plot}Per-Class F1 Score}
-
-\end{minipage}%
-\newline
-\begin{minipage}{0.50\linewidth}
-
-\centering{
-
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{results/confusion_matrices.png}
-
-}
-
-\subcaption{\label{fig-confusion-matrices}Normalized Confusion Matrices}
-
-\end{minipage}%
-
-\caption{\label{fig-results}Overall evaluation results, including
-metrics confidence bounds and error distributions.}
-
-\end{figure*}%
-
-\subsubsection{Justification of the Best
-Model}\label{justification-of-the-best-model}
-
-Based on the empirical results, the \textbf{Fine-Tuned DistilBERT} model
-is the superior model: 1. \textbf{Statistical Significance:} The 95\%
-confidence interval for DistilBERT's accuracy (\([0.703, 0.728]\)) does
-not overlap with the baseline's accuracy confidence interval
-(\([0.622, 0.650]\)). The lower bound of DistilBERT is strictly greater
-than the upper bound of the baseline, which proves that the performance
-improvement is statistically significant. 2. \textbf{Consistent Class
-Improvements:} DistilBERT outperforms the baseline on all classes. The
-most significant improvement occurs in the minority ``ambiguous'' class,
-where the F1-score increases from 0.452 to 0.566 (+0.114 improvement),
-and the ``negative'' class, where the F1-score increases from 0.576 to
-0.674 (+0.098 improvement), demonstrating that the contextual
-transformer is better equipped to handle subtle, complex, and negative
-emotional expressions.
-
-\section{Pros and Cons of the
-Approach}\label{pros-and-cons-of-the-approach}
-
-\subsubsection{TF-IDF + Logistic
-Regression}\label{tf-idf-logistic-regression}
+\subsubsection{TF-IDF + Logistic Regression
+Errors}\label{tf-idf-logistic-regression-errors}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Pros:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \textbf{Efficiency:} Training takes less than 30 seconds and
-    requires minimal memory and CPU resources.
-  \item
-    \textbf{Interpretability:} The linear model weights are directly
-    inspectable, allowing us to find the most indicative n-grams for
-    each sentiment.
-  \item
-    \textbf{Simplicity:} No hyperparameter tuning or deep learning
-    infrastructure is required.
-  \end{itemize}
+  \textbf{Blindness to Valence Shifts and Negation:} Because the model
+  relies on sparse n-gram occurrences, it is blind to contextual shifts
+  in sentiment. For example, it misclassified the negative comment
+  \emph{``I'm sorry to hear that friend :(. It's for the best\ldots{}''}
+  as \emph{positive} due to the high coefficients of words like
+  \texttt{"best"}, \texttt{"friend"}, and \texttt{"accept"}. Similarly,
+  it misclassified \emph{``It's wonderful because it's awful.''} (which
+  is \emph{positive}) as \emph{negative} due to the presence of the word
+  \texttt{"awful"}.
 \item
-  \textbf{Cons:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \textbf{Lack of Context:} By relying on bag-of-words, the model
-    ignores word order, meaning sentences like ``not positive'' and
-    ``positive, not'' have identical feature representations.
-  \item
-    \textbf{Out-of-Vocabulary (OOV):} The model cannot handle words
-    unseen during training.
-  \end{itemize}
+  \textbf{Over-reliance on Superficial Indicators:} The baseline is
+  highly sensitive to explicit lexical cues. For example, features with
+  large positive-class coefficients, such as \texttt{"lol"} (10.28) and
+  \texttt{"thanks"} (10.18), strongly influence \emph{positive}
+  predictions, even in sarcastic context. Conversely, since the
+  \emph{neutral} class lacks distinct emotional words, the model is
+  forced to rely on noisy structural features like \texttt{"they"}
+  (2.31) or bot commands like \texttt{"remindme"} (1.55), which
+  generalize poorly.
+\item
+  \textbf{Out-of-Vocabulary (OOV) and Spelling Variations:} The
+  word-level representation cannot generalize to spelling variations,
+  typos, or slang unseen during training.
 \end{itemize}
 
-\subsubsection{Fine-Tuned DistilBERT}\label{fine-tuned-distilbert}
+\subsubsection{DistilBERT Errors}\label{distilbert-errors}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Pros:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \textbf{Contextual Representation:} Captures complex syntactic
-    patterns, semantic dependencies, and word order.
-  \item
-    \textbf{Transfer Learning:} Leverages massive pre-training on
-    general English corpora, allowing it to adapt to social media text
-    with very few training epochs (e.g., fine-tuned on the full 36k
-    examples for only 2 epochs).
-  \item
-    \textbf{Robustness:} Handles spelling mistakes, subwords, and
-    abbreviations via WordPiece tokenization.
-  \end{itemize}
+  \textbf{Sensitivity to Aggressive Phrasing in Neutral Comments:}
+  DistilBERT tends to over-predict the \emph{negative} class when
+  comments contain strong punctuation or demanding phrasing, even if the
+  content itself is neutral. For example, it misclassified \emph{``You
+  take that back right now! {[}NAME{]} does not deserve this.''}
+  (labeled \emph{neutral} in GoEmotions) as \emph{negative}.
 \item
-  \textbf{Cons:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \textbf{Resource Intensive:} Requires significant compute time (took
-    \textasciitilde10 minutes on CPU for a single epoch) and memory.
-  \item
-    \textbf{Black Box:} High-dimensional attention maps and weights make
-    model predictions hard to interpret.
-  \end{itemize}
+  \textbf{Failure on Short, Elliptical Queries:} For short, elliptical
+  queries, DistilBERT may struggle when structural cues dominate the
+  meaning of the sentence. For instance, for the ambiguous question
+  \emph{``out of everyone why AC?''}, DistilBERT predicted
+  \emph{neutral}, whereas the baseline correctly identified it as
+  \emph{ambiguous} by matching the key feature \texttt{"why"}.
+\item
+  \textbf{Interpretability Deficit:} Unlike the logistic regression
+  baseline where the feature coefficients directly explain why a
+  classification was made, DistilBERT's deep representations act as a
+  black box, making individual failures difficult to debug or audit.
 \end{itemize}
 
 \section{Conclusion}\label{conclusion}
 
-We compared a traditional linear baseline with a transformer model on a
-4-way sentiment classification task using the GoEmotions dataset. Our
-evaluation demonstrates that a fine-tuned DistilBERT transformer
-significantly outperforms a TF-IDF + Logistic Regression baseline
-trained on the same data. The accuracy improvement (0.715 vs.~0.636) is
-statistically significant as verified by non-overlapping bootstrap
-confidence intervals. The transformer's ability to represent word order
-and contextual nuances is especially beneficial for noisy social media
-comments, justifying the additional computational cost.
+These findings demonstrate that contextual transformer models
+substantially improve sentiment classification of noisy social media
+text. While TF-IDF remains valuable when efficiency and interpretability
+are priorities, DistilBERT provides a clear advantage for modeling
+context-dependent emotional expressions.
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-demszky-etal-2020-goemotions}
+Demszky, Dorottya, Dana Movshovitz-Attias, Jeongwoo Ko, Alan Cowen,
+Gaurav Nemade, and Sujith Ravi. 2020. {``{G}o{E}motions: A Dataset of
+Fine-Grained Emotions.''} In \emph{Proceedings of the 58th Annual
+Meeting of the Association for Computational Linguistics}, 4040--54.
+Online: Association for Computational Linguistics.
+\url{https://doi.org/10.18653/v1/2020.acl-main.372}.
+
+\bibitem[\citeproctext]{ref-sanh2019distilbert}
+Sanh, Victor, Lysandre Debut, Julien Chaumond, and Thomas Wolf. 2019.
+{``{D}istil{BERT}, a Distilled Version of {BERT}: Smaller, Faster,
+Cheaper and Lighter.''} \emph{arXiv Preprint arXiv:1910.01108}.
+
+\end{CSLReferences}
 
 
 
