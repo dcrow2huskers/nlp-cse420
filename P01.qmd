@@ -7,6 +7,7 @@ format:
     keep-tex: true
 editor: visual
 bibliography: references.bib
+link-citations: true
 include-in-header:
   text: |
     \usepackage{tikz}
@@ -21,7 +22,7 @@ header-includes:
   - \usepackage{algorithmic}
   - \usepackage{setspace}
   - \usepackage{caption}
-  - \usepackage{hyperref}
+  - \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
 ---
 
 ```{=latex}
@@ -48,7 +49,7 @@ header-includes:
 \maketitle
 
 \begin{abstract}
-In this work, we study sentiment classification on the GoEmotions dataset by mapping fine-grained emotions to four coarse sentiment categories: positive, negative, neutral, and ambiguous. To simplify the task in a single-label setting, only samples with exactly one emotion label are retained. We train and compare two classification models: a Term Frequency-Inverse Document Frequency (TF-IDF) feature pipeline with a Logistic Regression classifier, and a fine-tuned DistilBERT transformer. Our experimental results show that the TF-IDF + Logistic Regression baseline achieves a classification accuracy of 0.636 (95\% Confidence Interval (CI) [0.622, 0.650]) and macro-F1 of 0.601 (95\% CI [0.585, 0.616]). Fine-tuning DistilBERT on the full training dataset yields a test accuracy of 0.715 (95\% CI [0.703, 0.728]) and macro-F1 of 0.684 (95\% CI [0.669, 0.699]). We report 95\% bootstrap confidence intervals for both models, demonstrating the range of performance variability on the test set.
+In this work, we study sentiment classification on the GoEmotions dataset by mapping fine-grained emotions to four coarse sentiment categories: positive, negative, neutral, and ambiguous. To formulate the problem as a single-label classification task, we retain only samples with exactly one emotion label. We train and compare two classification models: a Term Frequency-Inverse Document Frequency (TF-IDF) feature pipeline with a Logistic Regression classifier, and a fine-tuned DistilBERT transformer. Our experimental results show that the TF-IDF + Logistic Regression baseline achieves a classification accuracy of 0.636 (95\% Confidence Interval (CI) [0.622, 0.650]) and macro-F1 of 0.601 (95\% CI [0.585, 0.616]). Fine-tuning DistilBERT on the full training dataset yields a test accuracy of 0.715 (95\% CI [0.703, 0.728]) and macro-F1 of 0.684 (95\% CI [0.669, 0.699]). We report 95\% bootstrap confidence intervals for both models, demonstrating the range of performance variability on the test set.
 \end{abstract}
 ```
 
@@ -58,7 +59,7 @@ Emotion and sentiment analysis are fundamental tasks in Natural Language Process
 
 The GoEmotions dataset [@demszky-etal-2020-goemotions] is a large, human-annotated corpus with approximately 58,000 Reddit comments labeled with 28 fine-grained emotion categories. In this project, we address a simplified formulation of the task: 4-way single-label sentiment classification. We filter the comments to keep only those with exactly one emotion label, and map that label to one of four sentiment classes: positive, negative, neutral, or ambiguous.
 
-To address this task, we compare two modeling approaches. The first is a baseline model that combines TF-IDF features derived from word-level n-grams with a Logistic Regression classifier. The second is a transformer-based approach that fine-tunes a pre-trained DistilBERT model on the training data.
+To address this task, we compare two modeling approaches. The first is a baseline model that combines TF-IDF features derived from word-level $n$-grams with a Logistic Regression classifier. The second is a transformer-based approach that fine-tunes a pre-trained DistilBERT model on the training data.
 
 We evaluate both models on the test split, report their classification accuracy and macro-F1 scores along with 95% bootstrap confidence intervals. We also analyze their per-class performance to determine the best-performing model for the task.
 
@@ -85,7 +86,7 @@ We compare a linear baseline with a transformer-based model for sentiment classi
 
 ## TF-IDF + Logistic Regression (Baseline)
 
-The baseline model maps raw comments into a sparse vector space using term frequency-inverse document frequency (TF-IDF) feature weighting. Word-level n-grams (unigrams and bigrams) are extracted to capture both explicit emotional descriptors and local word combinations (such as negation phrases) [@scikit-learn]. The resulting vectors are passed to a multi-class Logistic Regression classifier, which models the probability of each sentiment class as a linear combination of the lexical features. To prevent overfitting to the large feature space, the model is trained with L2 regularization, and class weights are adjusted to compensate for training set imbalance.
+The baseline model maps raw comments into a sparse vector space using term frequency-inverse document frequency (TF-IDF) feature weighting. Word-level $n$-grams (unigrams and bigrams) are extracted to capture both explicit emotional descriptors and local word combinations (such as negation phrases) [@scikit-learn]. The resulting vectors are passed to a multi-class Logistic Regression classifier, which models the probability of each sentiment class as a linear combination of the lexical features. To prevent overfitting to the large feature space, the model is trained with L2 regularization, and class weights are adjusted to compensate for training set imbalance.
 
 ## Fine-Tuned DistilBERT (Transformer)
 
@@ -124,7 +125,7 @@ Total & 36,308 & 4,548 & 4,590 & 45,446 \\
 
 To ensure reproducibility, all dataset shuffling, model initializations, and evaluations are fixed with a random seed of 42.
 
-For the TF-IDF + Logistic Regression baseline, features are computed using word-level n-grams with $n \in \{1,2\}$ [@scikit-learn]. We restrict the vocabulary to the top 50,000 features, filter out features appearing in only one document ($\text{min\_df} = 2$), and apply sublinear term-frequency scaling ($\text{tf} \leftarrow 1 + \log(\text{tf})$). The Logistic Regression classifier is regularized with an inverse strength parameter of $C = 1.0$ and optimized using the L-BFGS solver with a maximum of 1,000 iterations. The model uses balanced class weights to compensate for class imbalance.
+For the TF-IDF + Logistic Regression baseline, features are computed using word-level $n$-grams with $n \in \{1,2\}$ [@scikit-learn]. We restrict the vocabulary to the top 50,000 features, filter out features appearing in only one document ($\text{min\_df} = 2$), and apply sublinear term-frequency scaling ($\text{tf} \leftarrow 1 + \log(\text{tf})$). The Logistic Regression classifier is regularized with an inverse strength parameter of $C = 1.0$ and optimized using the L-BFGS solver with a maximum of 1,000 iterations. The model uses balanced class weights to compensate for class imbalance.
 
 For DistilBERT, input texts are padded or truncated to a maximum sequence length of 64 tokens. The model is fine-tuned for two epochs using the AdamW optimizer with a learning rate of $2 \times 10^{-5}$ and a batch size of 16. Training was conducted using GPU acceleration. Unlike the baseline, DistilBERT is trained using standard cross-entropy loss without class weight adjustment.
 
@@ -252,7 +253,7 @@ The quantitative breakdown in Table \ref{tab:error_stats} reveals that both mode
 
 ### TF-IDF + Logistic Regression Errors
 
--   **Inability to Capture Valence Shifts and Negation:** Because the baseline relies on sparse n-gram occurrences, it fails to capture contextual shifts in sentiment. For example, it misclassified the negative comment *"I’m sorry to hear that friend :(. It’s for the best..."* as *positive* due to the high coefficients of words like `"best"`, `"friend"`, and `"accept"`. Similarly, it misclassified *"It's wonderful because it's awful."* (which is *positive*) as *negative* due to the presence of the word `"awful"`.
+-   **Inability to Capture Valence Shifts and Negation:** Because the baseline relies on sparse $n$-gram occurrences, it fails to capture contextual shifts in sentiment. For example, it misclassified the negative comment *"I’m sorry to hear that friend :(. It’s for the best..."* as *positive* due to the high coefficients of words like `"best"`, `"friend"`, and `"accept"`. Similarly, it misclassified *"It's wonderful because it's awful."* (which is *positive*) as *negative* due to the presence of the word `"awful"`.
 -   **Sensitivity to Superficial Lexical Cues:** The baseline is highly sensitive to explicit lexical indicators. Features with large positive-class coefficients, such as `"lol"` (10.28) and `"thanks"` (10.18), strongly bias the model toward *positive* predictions, even in sarcastic contexts. Conversely, since the *neutral* class lacks distinct emotional vocabulary, the model is forced to rely on noisy structural features like `"they"` (2.31) or bot commands like `"remindme"` (1.55), which generalize poorly.
 -   **Vulnerability to Out-of-Vocabulary (OOV) Terms:** The word-level representation cannot generalize to spelling variations, typos, or slang unseen during training.
 
@@ -269,6 +270,7 @@ The performance gains achieved by the transformer model come with substantial co
 ## Limitations
 
 This study has several scoping limitations:
+
 1.  **Dataset Filtering:** By retaining only comments with exactly one emotion label, we discarded approximately half of the original GoEmotions dataset. This simplifies the multi-label nature of real-world emotion classification and biases the distribution toward unambiguous expressions.
 2.  **Short Sequence Length:** Truncating inputs to 64 tokens may discard context from longer comments.
 3.  **Domain Bias:** The models were trained and evaluated exclusively on Reddit comments, meaning they may not generalize well to other domains (e.g., formal news text or clinical notes) due to the prevalence of platform-specific slang and structures.
